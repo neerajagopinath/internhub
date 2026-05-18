@@ -1,24 +1,41 @@
 package com.example.intern_dashboard.service;
 
-import com.example.intern_dashboard.dto.request.InternRequest;
-import com.example.intern_dashboard.dto.response.ApiResponse;
-import com.example.intern_dashboard.dto.response.InternResponse;
-
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+
+import com.example.intern_dashboard.dto.request.InternRequest;
+import com.example.intern_dashboard.dto.response.InternResponse;
+import com.example.intern_dashboard.enums.InternStatus;
 
 public interface InternService {
 
-    ApiResponse createIntern(InternRequest request);
+    Page<InternResponse> getAllInterns(
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    );
 
-    List<InternResponse> getAllInterns();
+    InternResponse getInternById(Integer id);
 
-    InternResponse getInternById(int id);
+    InternResponse createIntern(InternRequest dto);
 
-    ApiResponse updateIntern(int id, InternRequest request);
+    InternResponse updateIntern(
+            Integer id,
+            InternRequest dto
+    );
 
-    ApiResponse deleteIntern(int id);
+    void deleteIntern(Integer id);
 
-    List<InternResponse> searchInterns(String name);
+    List<InternResponse> searchInterns(String keyword);
 
-    InternResponse updateIntern(Integer id, InternRequest dto);
+    Page<InternResponse> filterInterns(
+            InternStatus status,
+            String department,
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    );
 }

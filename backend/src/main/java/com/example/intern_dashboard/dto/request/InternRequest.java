@@ -1,14 +1,39 @@
 package com.example.intern_dashboard.dto.request;
 
+import com.example.intern_dashboard.enums.InternStatus;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class InternRequest {
 
+    @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 50,
+            message = "Name must be between 2 and 50 characters")
     private String name;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
+
+    @NotBlank(message = "Department is required")
     private String department;
+
+    @NotBlank(message = "College is required")
     private String college;
+
+    @NotBlank(message = "Phone is required")
+    @Size(min = 10, max = 15,
+            message = "Phone number must be between 10 and 15 digits")
     private String phone;
+
+    @NotBlank(message = "Joining date is required")
     private String joiningDate;
-    private String status;
+
+    @NotNull(message = "Status is required")
+    private InternStatus status;
 
     public InternRequest() {
     }
@@ -61,11 +86,11 @@ public class InternRequest {
         this.joiningDate = joiningDate;
     }
 
-    public String getStatus() {
+    public InternStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(InternStatus status) {
         this.status = status;
     }
 }
