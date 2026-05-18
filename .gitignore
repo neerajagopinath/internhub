@@ -1,0 +1,17 @@
+# Frontend
+frontend/internhub-frontend/node_modules/
+frontend/internhub-frontend/dist/
+
+# Backend
+backend/spring-intern/target/
+
+# Env files
+.env
+env
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
