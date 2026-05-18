@@ -1,253 +1,299 @@
 import { useEffect, useState } from "react";
 
-import Sidebar from "../components/layout/Sidebar";
-
-import SearchBar from "../components/intern/SearchBar";
-
-import InternCard from "../components/intern/InternCard";
-
-import InternForm from "../components/intern/InternForm";
-
 import {
-
-  getAllInterns,
-  createIntern,
-  updateIntern,
-  deleteIntern,
-  searchInterns
-
+    getAllInterns,
+    searchInterns,
+    deleteIntern,
+    createIntern,
+    updateIntern
 } from "../services/internService";
 
-import "../styles/interns.css";
+import InternTable from "../components/intern/InternTable";
+import SearchToolbar from "../components/intern/SearchToolbar";
+import Pagination from "../components/intern/Pagination";
+import InternForm from "../components/intern/InternForm";
+
+import Loader from "../components/common/Loader";
+import EmptyState from "../components/common/EmptyState";
+import Modal from "../components/common/Modal";
+import Button from "../components/common/Button";
+
+import "../styles/pages/interns-page.css";
 
 function InternsPage() {
 
-  const [interns, setInterns] = useState([]);
+    const [interns, setInterns] = useState([]);
 
-  const [loading, setLoading] = useState(false);
-  const [editingId, setEditingId] = useState(null);
+    const [loading, setLoading] = useState(false);
 
-  const [searchTerm, setSearchTerm] = useState("");
+    const [search, setSearch] = useState("");
 
-  const [formData, setFormData] = useState({
+    const [status, setStatus] = useState("");
 
-    name: "",
-    email: "",
-    department: "",
-    college: "",
-    phone: "",
-    joiningDate: "",
-    status: "",
+    const [sortBy, setSortBy] =
+        useState("id");
 
-  });
+    const [currentPage, setCurrentPage] =
+        useState(0);
 
-  useEffect(() => {
+    const [totalPages, setTotalPages] =
+        useState(0);
 
-    fetchInterns();
+    const [showCreateModal, setShowCreateModal] =
+        useState(false);
 
-  }, []);
+    const [showEditModal, setShowEditModal] =
+        useState(false);
 
-  const fetchInterns = async () => {
+    const [selectedIntern, setSelectedIntern] =
+        useState(null);
 
-    try {
+    const pageSize = 5;
 
-      const data = await getAllInterns();
+    useEffect(() => {
 
-      setInterns(data);
+        fetchInterns();
 
-    }
-    catch (error) {
+    }, [
+        currentPage,
+        search,
+        status,
+        sortBy
+    ]);
 
-      console.error(error);
+    async function fetchInterns() {
 
-    }
+        try {
 
-  };
+            setLoading(true);
 
-  const handleChange = (event) => {
+            let response;
 
-    setFormData({
+            if (search.trim() !== "") {
 
-      ...formData,
+                response =
+                    await searchInterns(
+                        search,
+                        currentPage,
+                        pageSize,
+                        sortBy,
+                        "asc"
+                    );
 
-      [event.target.name]:
-      event.target.value,
+            } else {
 
-    });
+                response =
+                    await getAllInterns(
+                        currentPage,
+                        pageSize,
+                        sortBy,
+                        "asc"
+                    );
+            }
 
-  };
+            let data = response.content;
 
-  const handleSubmit = async () => {
+            if (status !== "") {
 
-    try {
+                data =
+                    data.filter(
+                        (intern) =>
+                            intern.status === status
+                    );
+            }
 
-      setLoading(true);
+            setInterns(data);
 
-      if (editingId) {
+            setTotalPages(response.totalPages);
 
-        await updateIntern(
-          editingId,
-          formData
-        );
+        } catch (error) {
 
-      }
-      else {
+            console.error(
+                "Failed to fetch interns",
+                error
+            );
 
-        await createIntern(formData);
+        } finally {
 
-      }
-
-      fetchInterns();
-
-      setFormData({
-
-        name: "",
-        email: "",
-        department: "",
-        college: "",
-        phone: "",
-        joiningDate: "",
-        status: "",
-
-      });
-
-      setEditingId(null);
-
-    }
-    catch (error) {
-
-      console.error(error);
-
-    }
-    finally {
-
-      setLoading(false);
-
+            setLoading(false);
+        }
     }
 
-  };
+    async function handleCreate(formData) {
 
-  const handleEdit = (intern) => {
+        try {
 
-    setEditingId(intern.id);
+            await createIntern(formData);
 
-    setFormData({
+            setShowCreateModal(false);
 
-      name: intern.name,
-      email: intern.email,
-      department: intern.department,
-      college: intern.college,
-      phone: intern.phone,
-      joiningDate: intern.joiningDate,
-      status: intern.status,
+            fetchInterns();
 
-    });
+        } catch (error) {
 
-  };
-
-  const handleDelete = async (id) => {
-
-    try {
-
-      await deleteIntern(id);
-
-      fetchInterns();
-
-    }
-    catch (error) {
-
-      console.error(error);
-
+            console.error(
+                "Failed to create intern",
+                error
+            );
+        }
     }
 
-  };
+    async function handleUpdate(formData) {
 
-  const handleSearch = async () => {
+        try {
 
-    if (!searchTerm.trim()) {
+            await updateIntern(
+                selectedIntern.id,
+                formData
+            );
 
-      fetchInterns();
+            setShowEditModal(false);
 
-      return;
+            setSelectedIntern(null);
 
+            fetchInterns();
+
+        } catch (error) {
+
+            console.error(
+                "Failed to update intern",
+                error
+            );
+        }
     }
 
-    try {
+    async function handleDelete(id) {
 
-      const data = await searchInterns(
-        searchTerm
-      );
+        const confirmed =
+            window.confirm(
+                "Are you sure you want to delete this intern?"
+            );
 
-      setInterns(data);
+        if (!confirmed) {
+            return;
+        }
 
+        try {
+
+            await deleteIntern(id);
+
+            fetchInterns();
+
+        } catch (error) {
+
+            console.error(
+                "Failed to delete intern",
+                error
+            );
+        }
     }
-    catch (error) {
 
-      console.error(error);
+    function handleEdit(intern) {
 
+        setSelectedIntern(intern);
+
+        setShowEditModal(true);
     }
 
-  };
+    return (
 
-  return (
+        <div className="interns-page">
 
-    <div className="dashboard-container">
+            <div className="interns-header">
 
-      <Sidebar />
+                <h1>Intern Management</h1>
 
-      <div className="main-content">
+                <Button
+                    onClick={() =>
+                        setShowCreateModal(true)
+                    }
+                >
+                    Add Intern
+                </Button>
 
-        <div className="top-section">
+            </div>
 
-          <h1 className="page-title">
-            Interns
-          </h1>
+            <SearchToolbar
+                search={search}
+                setSearch={setSearch}
+                status={status}
+                setStatus={setStatus}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+            />
 
-        </div>
+            {
 
-        <SearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          handleSearch={handleSearch}
-        />
+                loading ? (
 
-        <InternForm
-          formData={formData}
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-          loading={loading}
-          editingId={editingId}
-        />
+                    <Loader />
 
-        <div className="intern-list">
+                ) : interns.length === 0 ? (
 
-          {
-            interns.length === 0
-            ? (
-              <p>No interns found</p>
-            )
-            : (
-              interns.map((intern) => (
+                    <EmptyState
+                        message="No interns found"
+                    />
 
-                <InternCard
-                  key={intern.id}
-                  intern={intern}
-                  handleDelete={handleDelete}
-                  handleEdit={handleEdit}
+                ) : (
+
+                    <>
+
+                        <InternTable
+                            interns={interns}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                        />
+
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+
+                    </>
+
+                )
+            }
+
+            <Modal
+                isOpen={showCreateModal}
+                title="Create Intern"
+                onClose={() =>
+                    setShowCreateModal(false)
+                }
+            >
+
+                <InternForm
+                    onSubmit={handleCreate}
+                    onCancel={() =>
+                        setShowCreateModal(false)
+                    }
                 />
 
-              ))
-            )
-          }
+            </Modal>
+
+            <Modal
+                isOpen={showEditModal}
+                title="Edit Intern"
+                onClose={() => {
+                    setShowEditModal(false);
+                    setSelectedIntern(null);
+                }}
+            >
+
+                <InternForm
+                    initialData={selectedIntern}
+                    onSubmit={handleUpdate}
+                    onCancel={() => {
+                        setShowEditModal(false);
+                        setSelectedIntern(null);
+                    }}
+                />
+
+            </Modal>
 
         </div>
-
-      </div>
-
-    </div>
-
-  );
-
+    );
 }
 
 export default InternsPage;

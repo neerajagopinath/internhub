@@ -1,144 +1,147 @@
+import { useEffect, useState } from "react";
+
+import Input from "../common/Input";
+import Button from "../common/Button";
+
+import "../../styles/intern/intern-form.css";
+
 function InternForm({
-
-  formData,
-  handleChange,
-  handleSubmit,
-  loading,
-  editingId
-
+    initialData = null,
+    onSubmit,
+    onCancel
 }) {
 
-  return (
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        department: "",
+        college: "",
+        phone: "",
+        joiningDate: "",
+        status: "ACTIVE"
+    });
 
-    <div className="form-box">
+    useEffect(() => {
 
-      <h3>
+        if (initialData) {
 
-        {
-          editingId
-          ? "Edit Intern"
-          : "Add New Intern"
+            setFormData({
+                name: initialData.name || "",
+                email: initialData.email || "",
+                department: initialData.department || "",
+                college: initialData.college || "",
+                phone: initialData.phone || "",
+                joiningDate: initialData.joiningDate || "",
+                status: initialData.status || "ACTIVE"
+            });
         }
 
-      </h3>
+    }, [initialData]);
 
-      <div className="input-group">
+    function handleChange(event) {
 
-        <label>Name</label>
+        const { name, value } = event.target;
 
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-        />
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value
+        }));
+    }
 
-      </div>
+    function handleSubmit(event) {
 
-      <div className="input-group">
+        event.preventDefault();
 
-        <label>Email</label>
+        onSubmit(formData);
+    }
 
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
+    return (
 
-      </div>
+        <form
+            className="intern-form"
+            onSubmit={handleSubmit}
+        >
 
-      <div className="input-group">
+            <Input
+                name="name"
+                placeholder="Name"
+                value={formData.name}
+                onChange={handleChange}
+            />
 
-        <label>Department</label>
+            <Input
+                name="email"
+                type="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+            />
 
-        <input
-          type="text"
-          name="department"
-          value={formData.department}
-          onChange={handleChange}
-        />
+            <Input
+                name="department"
+                placeholder="Department"
+                value={formData.department}
+                onChange={handleChange}
+            />
 
-      </div>
+            <Input
+                name="college"
+                placeholder="College"
+                value={formData.college}
+                onChange={handleChange}
+            />
 
-      <div className="input-group">
+            <Input
+                name="phone"
+                placeholder="Phone"
+                value={formData.phone}
+                onChange={handleChange}
+            />
 
-        <label>College</label>
+            <Input
+                name="joiningDate"
+                placeholder="Joining Date"
+                value={formData.joiningDate}
+                onChange={handleChange}
+            />
 
-        <input
-          type="text"
-          name="college"
-          value={formData.college}
-          onChange={handleChange}
-        />
+            <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="status-select"
+            >
+                <option value="ACTIVE">
+                    ACTIVE
+                </option>
 
-      </div>
+                <option value="INACTIVE">
+                    INACTIVE
+                </option>
 
-      <div className="input-group">
+                <option value="COMPLETED">
+                    COMPLETED
+                </option>
+            </select>
 
-        <label>Phone</label>
+            <div className="form-buttons">
 
-        <input
-          type="text"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-        />
+                <Button type="submit">
+                    Save
+                </Button>
 
-      </div>
+                <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={onCancel}
+                >
+                    Cancel
+                </Button>
 
-      <div className="input-group">
+            </div>
 
-        <label>Joining Date</label>
-
-        <input
-          type="date"
-          name="joiningDate"
-          value={formData.joiningDate}
-          onChange={handleChange}
-        />
-
-      </div>
-
-      <div className="input-group">
-
-        <label>Status</label>
-
-        <input
-          type="text"
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-        />
-
-      </div>
-
-      <button
-        className="submit-btn"
-        onClick={handleSubmit}
-        disabled={loading}
-      >
-
-        {
-          loading
-          ? (
-              editingId
-              ? "Updating..."
-              : "Adding..."
-            )
-          : (
-              editingId
-              ? "Update Intern"
-              : "Add Intern"
-            )
-        }
-
-      </button>
-
-    </div>
-
-  );
-
+        </form>
+    );
 }
 
 export default InternForm;

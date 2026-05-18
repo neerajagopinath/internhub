@@ -1,0 +1,21 @@
+.intern-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.status-select {
+    padding: 12px;
+
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+
+    font-size: 14px;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 12px;
+
+    justify-content: flex-end;
+}

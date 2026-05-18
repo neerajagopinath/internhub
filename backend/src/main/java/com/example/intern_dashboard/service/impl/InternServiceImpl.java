@@ -164,15 +164,39 @@ public class InternServiceImpl implements InternService {
     }
 
     @Override
-    public List<InternResponse> searchInterns(
-            String keyword
-    ) {
+    public Page<InternResponse> searchInterns(
+                String keyword,
+                int page,
+                int size,
+                String sortBy,
+                String direction
+        ) {
 
-        return internRepository
-                .findByNameContainingIgnoreCaseAndIsDeletedFalse(keyword)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable =
+                PageRequest.of(page, size, sort);
+
+        Page<Intern> internPage =
+                internRepository
+                        .findByNameContainingIgnoreCaseAndIsDeletedFalse(
+                                keyword,
+                                pageable
+                        );
+
+        List<InternResponse> responses =
+                internPage.getContent()
+                        .stream()
+                        .map(this::mapToResponse)
+                        .toList();
+
+        return new PageImpl<>(
+                responses,
+                pageable,
+                internPage.getTotalElements()
+        );
     }
 
     @Override

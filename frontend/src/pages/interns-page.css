@@ -1,0 +1,15 @@
+.interns-page {
+    padding: 30px;
+}
+
+.interns-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+.interns-header h1 {
+    margin: 0;
+}

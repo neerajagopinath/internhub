@@ -1,7 +1,5 @@
 package com.example.intern_dashboard.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 
 import com.example.intern_dashboard.dto.request.InternRequest;
@@ -28,7 +26,13 @@ public interface InternService {
 
     void deleteIntern(Integer id);
 
-    List<InternResponse> searchInterns(String keyword);
+    Page<InternResponse> searchInterns(
+            String keyword,
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    );
 
     Page<InternResponse> filterInterns(
             InternStatus status,

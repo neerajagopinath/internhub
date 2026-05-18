@@ -1,46 +1,72 @@
-import api from "../utils/api";
+import axios from "axios";
 
-export const getAllInterns = async () => {
-  const response = await api.get("/api/interns");
+const API_URL =
+    "http://localhost:8080/api/interns";
 
-  return response.data;
-};
+export async function getAllInterns(
+    page = 0,
+    size = 5,
+    sortBy = "id",
+    direction = "asc"
+) {
 
-export const createIntern = async (internData) => {
-  const response = await api.post(
-    "/api/interns",
+    const response =
+        await axios.get(
+            `${API_URL}?page=${page}&size=${size}&sortBy=${sortBy}&direction=${direction}`
+        );
+
+    return response.data;
+}
+
+export async function searchInterns(
+    keyword,
+    page = 0,
+    size = 5,
+    sortBy = "id",
+    direction = "asc"
+) {
+
+    const response =
+        await axios.get(
+            `${API_URL}/search?keyword=${keyword}&page=${page}&size=${size}&sortBy=${sortBy}&direction=${direction}`
+        );
+
+    return response.data;
+}
+
+export async function createIntern(
     internData
-  );
+) {
 
-  return response.data;
-};
+    const response =
+        await axios.post(
+            API_URL,
+            internData
+        );
 
-export const deleteIntern = async (id) => {
-  const response = await api.delete(
-    `/api/interns/${id}`
-  );
+    return response.data;
+}
 
-  return response.data;
-};
-
-export const searchInterns = async (name) => {
-  const response = await api.get(
-    `/api/interns/search?name=${name}`
-  );
-
-  return response.data;
-};
-
-export const updateIntern = async (
-  id,
-  internData
-) => {
-
-  const response = await api.put(
-    `/api/interns/${id}`,
+export async function updateIntern(
+    id,
     internData
-  );
+) {
 
-  return response.data;
+    const response =
+        await axios.put(
+            `${API_URL}/${id}`,
+            internData
+        );
 
-};
+    return response.data;
+}
+
+export async function deleteIntern(id) {
+
+    const response =
+        await axios.delete(
+            `${API_URL}/${id}`
+        );
+
+    return response.data;
+}

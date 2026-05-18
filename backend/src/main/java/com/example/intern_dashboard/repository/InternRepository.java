@@ -1,7 +1,5 @@
 package com.example.intern_dashboard.repository;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,8 +10,10 @@ import com.example.intern_dashboard.enums.InternStatus;
 public interface InternRepository
         extends JpaRepository<Intern, Integer> {
 
-    List<Intern> findByNameContainingIgnoreCaseAndIsDeletedFalse(
-            String keyword
+    Page<Intern>
+    findByNameContainingIgnoreCaseAndIsDeletedFalse(
+            String keyword,
+            Pageable pageable
     );
 
     Page<Intern> findByIsDeletedFalse(
@@ -25,7 +25,8 @@ public interface InternRepository
             Pageable pageable
     );
 
-    Page<Intern> findByDepartmentContainingIgnoreCaseAndIsDeletedFalse(
+    Page<Intern>
+    findByDepartmentContainingIgnoreCaseAndIsDeletedFalse(
             String department,
             Pageable pageable
     );
